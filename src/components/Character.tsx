@@ -1,6 +1,4 @@
-import { Avatar } from '@/components/ui/avatar';
 import { Character } from '@/types/character';
-import { Card } from '@/components/ui/card';
 
 interface Props {
   character: Character;
@@ -8,31 +6,32 @@ interface Props {
 }
 
 const CharacterComponent = ({ character, onClick }: Props) => (
-  <Card
-    variant="elevated"
-    className="cursor-pointer flex flex-col sm:flex-row items-center gap-4 h-full w-full p-4 overflow-hidden"
+  <div
+    className='flex flex-row'
+    style={{ gap: 20, paddingBottom: 10, paddingTop: 10 }}
     onClick={() => onClick(character.id)}
   >
-    <Avatar
-      src={character.image}
-      alt={character.name}
-      size="lg"
-      interactive
-      className="flex-shrink-0"
-    />
+    {/* Image */}
+    <div className='w-40 h-fit flex-shrink-0 cursor-pointer'>
+      <img src={character.image} alt={character.name} />
+    </div>
 
-    <div className="flex-1 min-w-0 text-center sm:text-left">
-      <h3 className="text-lg font-semibold truncate leading-tight">
+    {/* Content */}
+    <div className='p-5 flex flex-col justify-between'>
+      <h3 className='text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors'>
         {character.name}
       </h3>
-      <p className="text-sm text-gray-500 italic">
-        {character.species}
+
+      <p className='text-sm font-medium text-blue-500 uppercase tracking-widest text-[11px]'>
+        {character.species} — {character.gender}
       </p>
-      <p className="text-xs text-gray-400 truncate mt-1 hidden md:block">
-        📍 {character.location.name}
+
+      <p className='text-sm text-gray-400 mt-2 truncate'>
+        <span className='text-gray-300'>Origin:</span> {character.origin.name}
       </p>
     </div>
-  </Card>
+  </div>
 );
+
 
 export default CharacterComponent;

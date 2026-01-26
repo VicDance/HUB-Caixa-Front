@@ -4,46 +4,51 @@ import { Filter } from '@/components/Filter';
 import { useCharacters } from '@/hooks/useCharacters';
 import CharacterComponent from '@/components/Character';
 
+// HomePage.tsx
 const HomePage: React.FC = () => {
   const [filters, setFilters] = useState({});
-  const { characters, loading, error } = useCharacters(filters);
+  const { characters, loading } = useCharacters(filters);
   const navigate = useNavigate();
 
-  if (loading)
-    return <p className='p-6 text-center text-green-500'>Cargando portal...</p>;
-  if (error) return <p className='p-6 text-center text-red-500'>{error}</p>;
-
-  const getBentoClass = (index: number) => {
-    const pos = index % 5;
-    if (pos === 0) return 'md:col-span-2 md:row-span-2 h-full';
-    if (pos === 1) return 'md:col-span-2 md:row-span-1 h-full';
-    return 'md:col-span-1 md:row-span-1 h-full';
-  };
-
+  if (loading) return <div className="flex justify-center p-20 text-blue-500 animate-pulse font-bold text-xl">LOADING MULTIVERSE...</div>;
+  
   return (
-    <div className='min-h-screen bg-gray-100'>
-      <header className='bg-white shadow p-6 mb-4'>
-        <h1 className='text-2xl font-bold text-gray-800 italic'>
-          Rick & Morty <span className='text-green-500'>Multiverse</span>
+    <div className='min-h-screen bg-[#f9fafb] font-["Open_Sans",sans-serif]'>
+      <header className='bg-white py-12 px-6 text-center border-b border-gray-100'>
+        <h1 className='text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight'>
+          Our <span className='text-blue-600'>Characters</span>
         </h1>
+        <p className='mt-4 text-gray-500 max-w-2xl mx-auto text-lg'>
+          Explore the vast population of the Rick and Morty universe with
+          detailed information on every inhabitant.
+        </p>
       </header>
 
-      <div className='max-w-7xl mx-auto px-6'>
+      <div className='max-w-7xl p-6 md:p-12'>
         <Filter onChange={setFilters} />
 
-        <section className='grid grid-cols-1 md:grid-cols-4 auto-rows-[200px] gap-4 py-8'>
-          {characters.map((character, index) => (
-            <div
-              key={character.id}
-              className={`${getBentoClass(index)} transition-all duration-300 hover:z-10`}
-            >
+        <div className='flex flex-col'>
+          {characters.map((character) => (
+            <div key={character.id} className='flex flex-row'>
+              <CharacterComponent
+                character={character}
+                onClick={(id) => navigate(`/character/${id}`)}
+              />
+              {/* <div>Holita</div> */}
+            </div>
+          ))}
+        </div>
+
+        {/* <section className='flex flex-col mt-10'>
+          {characters.map((character) => (
+            <div key={character.id} className='flex gap-50'>
               <CharacterComponent
                 character={character}
                 onClick={(id) => navigate(`/character/${id}`)}
               />
             </div>
           ))}
-        </section>
+        </section> */}
       </div>
     </div>
   );
