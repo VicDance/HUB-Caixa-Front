@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Character } from '@/types/character';
-import { getCharacters } from '@/api/characterApi';
+import { getCharacters, getCharacterById } from '@/api/characterApi';
 
-export const useCharacters = (filters: { name?: string; species?: string }) => {
+export interface Filters {
+  name?: string;
+  species?: string;
+}
+
+export const useCharacters = (filters: Filters = {}, id?: number) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -10,32 +15,33 @@ export const useCharacters = (filters: { name?: string; species?: string }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchCharacters = async () => {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
 
+      let data: Character[] = [];
+
       try {
-        const data = await getCharacters(filters);
-        if (isMounted) {
-          setCharacters(data);
+        if (id != null) {
+          const character = await getCharacterById(id);
+          data = [character]; 
+        } else {
+          data = await getCharacters(filters);
         }
+        if (isMounted) setCharacters(data);
       } catch {
-        if (isMounted) {
-          setError('Error loading characters');
-        }
+        if (isMounted) setError('Error loading characters');
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchCharacters();
+    fetchData();
 
     return () => {
       isMounted = false;
     };
-  }, [filters]);
+  }, [filters, id]);
 
   return { characters, loading, error };
 };

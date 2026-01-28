@@ -4,9 +4,8 @@ import { Filter } from '@/components/Filter';
 import { useCharacters } from '@/hooks/useCharacters';
 import CharacterComponent from '@/components/Character';
 
-// HomePage.tsx
 const HomePage: React.FC = () => {
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<{ name?: string; species?: string }>({});
   const { characters, loading } = useCharacters(filters);
   const navigate = useNavigate();
 
@@ -34,21 +33,9 @@ const HomePage: React.FC = () => {
                 character={character}
                 onClick={(id) => navigate(`/character/${id}`)}
               />
-              {/* <div>Holita</div> */}
             </div>
           ))}
         </div>
-
-        {/* <section className='flex flex-col mt-10'>
-          {characters.map((character) => (
-            <div key={character.id} className='flex gap-50'>
-              <CharacterComponent
-                character={character}
-                onClick={(id) => navigate(`/character/${id}`)}
-              />
-            </div>
-          ))}
-        </section> */}
       </div>
     </div>
   );

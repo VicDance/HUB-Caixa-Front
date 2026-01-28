@@ -1,11 +1,9 @@
+import { Filters } from "@/hooks/useCharacters";
 import type { Character } from "@/types/character";
 
 const BASE_URL = 'https://rickandmortyapi.com/api';
 
-export const getCharacters = async (filters?: {
-  name?: string;
-  species?: string;
-}): Promise<Character[]> => {
+export const getCharacters = async (filters?: Filters): Promise<Character[]> => {
   const params = new URLSearchParams(filters as Record<string, string>);
   const response = await fetch(`${BASE_URL}/character?${params}`);
 
@@ -17,7 +15,7 @@ export const getCharacters = async (filters?: {
   return data.results;
 };
 
-export const getCharacterById = async (id: string): Promise<Character> => {
+export const getCharacterById = async (id: number): Promise<Character> => {
   const response = await fetch(`${BASE_URL}/character/${id}`);
 
   if (!response.ok) {
