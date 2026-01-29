@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Character } from '@/types/character';
 import { getCharacters, getCharacterById } from '@/api/characterApi';
 import {
@@ -17,6 +17,14 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
     [id, filters],
   );
 
+  const filtersRef = useRef(filters);
+  const idRef = useRef(id);
+
+  useEffect(() => {
+    filtersRef.current = filters;
+    idRef.current = id;
+  }, [filters, id]);
+
   useEffect(() => {
     const controller = new AbortController();
     let isMounted = true;
@@ -32,9 +40,9 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
 
       try {
         const data =
-          id != null
-            ? [await getCharacterById(id, controller.signal)]
-            : await getCharacters(filters, controller.signal);
+          idRef.current != null
+            ? [await getCharacterById(idRef.current, controller.signal)]
+            : await getCharacters(filtersRef.current, controller.signal);
 
         if (isMounted) {
           cache.set(cacheKey, data);
@@ -62,7 +70,7 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
       isMounted = false;
       controller.abort();
     };
-  }, [cacheKey, filters, id]);
+  }, [cacheKey]);
 
   return { characters, loading, error };
 };
