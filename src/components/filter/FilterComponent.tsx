@@ -1,35 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-export interface FilterProps {
-  onChange: (filters: { name?: string; species?: string }) => void;
+export interface CharacterFilters {
+  name?: string;
+  species?: string;
 }
 
-const Filters = ({ onChange }: FilterProps) => {
-  const [name, setName] = useState('');
-  const [species, setSpecies] = useState('');
+export interface FilterProps {
+  onChange: (filters: CharacterFilters) => void;
+  initialFilters?: CharacterFilters;
+}
+
+const FilterComponent = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [name, setName] = useState(searchParams.get('name') || '');
+  const [species, setSpecies] = useState(searchParams.get('species') || '');
 
   const TIMEOUT = 300;
 
-  const handleApplyFilters = () => {
-    onChange({ name, species });
-  };
-
-  const onChangeRef = useRef(onChange);
-
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  }, [onChange]);
-
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      onChangeRef.current({
-        name: name.trim() || undefined,
-        species: species || undefined,
-      });
+      const params: Record<string, string> = {};
+      if (name.trim()) params.name = name.trim();
+      if (species) params.species = species;
+
+      setSearchParams(params, { replace: true });
     }, TIMEOUT);
 
     return () => clearTimeout(timeoutId);
-  }, [name, species]);
+  }, [name, species, setSearchParams]);
 
   return (
     <div className='flex gap-4 mb-8'>
@@ -49,14 +48,8 @@ const Filters = ({ onChange }: FilterProps) => {
         <option value='human'>Human</option>
         <option value='alien'>Alien</option>
       </select>
-      <button
-        onClick={handleApplyFilters}
-        className='bg-blue-500 text-white px-4 py-2 rounded'
-      >
-        Filter
-      </button>
     </div>
   );
 };
 
-export default Filters;
+export default FilterComponent;

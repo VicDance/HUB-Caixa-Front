@@ -1,4 +1,4 @@
-import CharacterComponent from '@/components/Character';
+import CharacterComponent from '@/components/Character/Character';
 import { useCharacters } from '@/hooks/useCharacters';
 import { useParams } from 'react-router-dom';
 

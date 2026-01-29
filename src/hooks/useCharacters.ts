@@ -1,27 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Character } from '@/types/character';
 import { getCharacters, getCharacterById } from '@/api/characterApi';
+import {
+  CharacterFilters,
+} from '@/components/filter/FilterComponent';
 
-export interface Filters {
-  name?: string;
-  species?: string;
-}
+const cache = new Map<string, Character[]>();
 
-const cache: Record<string, Character[]> = {};
-
-export const useCharacters = (filters: Filters = {}, id?: number) => {
+export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filterKey = JSON.stringify(id ? { id } : filters);
+  const cacheKey = useMemo(
+    () => JSON.stringify({ id, ...filters }),
+    [id, filters],
+  );
 
   useEffect(() => {
+    const controller = new AbortController();
     let isMounted = true;
 
     const fetchData = async () => {
-      if (cache[filterKey]) {
-        setCharacters(cache[filterKey]);
+      if (cache.has(cacheKey)) {
+        setCharacters(cache.get(cacheKey)!);
+        setLoading(false)
       } else {
         setLoading(true);
       }
@@ -30,16 +33,21 @@ export const useCharacters = (filters: Filters = {}, id?: number) => {
       try {
         const data =
           id != null
-            ? [await getCharacterById(id)]
-            : await getCharacters(filters);
+            ? [await getCharacterById(id, controller.signal)]
+            : await getCharacters(filters, controller.signal);
 
         if (isMounted) {
-          cache[filterKey] = data;
+          cache.set(cacheKey, data);
           setCharacters(data);
+          setError(null);
         }
-      } catch {
-        if (isMounted) {
-          setError('Error loading characters');
+      } catch (err: unknown) {
+        const error = err as Error;
+        if (
+          error.name === 'AbortError' ||
+          error.message === 'The operation was aborted'
+        ) {
+          return;
         }
       } finally {
         if (isMounted) {
@@ -52,8 +60,9 @@ export const useCharacters = (filters: Filters = {}, id?: number) => {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
-  }, [filterKey, filters, id]);
+  }, [cacheKey, filters, id]);
 
   return { characters, loading, error };
 };
