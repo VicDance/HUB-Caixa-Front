@@ -7,32 +7,44 @@ export interface Filters {
   species?: string;
 }
 
+const cache: Record<string, Character[]> = {};
+
 export const useCharacters = (filters: Filters = {}, id?: number) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const filterKey = JSON.stringify(id ? { id } : filters);
+
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
-      setLoading(true);
+      if (cache[filterKey]) {
+        setCharacters(cache[filterKey]);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
-      let data: Character[] = [];
-
       try {
-        if (id != null) {
-          const character = await getCharacterById(id);
-          data = [character]; 
-        } else {
-          data = await getCharacters(filters);
+        const data =
+          id != null
+            ? [await getCharacterById(id)]
+            : await getCharacters(filters);
+
+        if (isMounted) {
+          cache[filterKey] = data;
+          setCharacters(data);
         }
-        if (isMounted) setCharacters(data);
       } catch {
-        if (isMounted) setError('Error loading characters');
+        if (isMounted) {
+          setError('Error loading characters');
+        }
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -41,7 +53,7 @@ export const useCharacters = (filters: Filters = {}, id?: number) => {
     return () => {
       isMounted = false;
     };
-  }, [filters, id]);
+  }, [filterKey, filters, id]);
 
   return { characters, loading, error };
 };
