@@ -2,6 +2,9 @@ import { useCharacters } from '@/hooks/useCharacters';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const FILTERS = {};
+const textStyle = {
+  color: 'GrayText'
+};
 
 const DetailsPage: React.FC = () => {
   const { id } = useParams();
@@ -50,14 +53,22 @@ const DetailsPage: React.FC = () => {
 
               {/* State Badge */}
               <span
-                className={`absolute bottom-2 right-2 px-10 py-2 rounded-full text-[10px] font-bold uppercase border-2 border-white shadow-sm ${
-                  character.status === 'Alive'
-                    ? 'bg-green-500 text-white'
-                    : character.status === 'Dead'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-500 text-white'
-                }`}
-                style={{ zIndex: 10 }}
+                className={`absolute bottom-2 -right-4 px-12 py-12 rounded-full text-[10px] font-bold uppercase border-2 border-white shadow-sm text-center`}
+                style={{
+                  minWidth: '50px',
+                  backgroundColor:
+                    character.status === 'Alive'
+                      ? '#dcfce7'
+                      : character.status === 'Dead'
+                        ? '#fee2e2'
+                        : '#f3f4f6',
+                  color:
+                    character.status === 'Alive'
+                      ? '#166534'
+                      : character.status === 'Dead'
+                        ? '#991b1b'
+                        : '#374151',
+                }}
               >
                 {character.status}
               </span>
@@ -73,46 +84,36 @@ const DetailsPage: React.FC = () => {
 
               <div className='grid grid-cols-2 gap-y-6 gap-x-4 mt-8'>
                 <div>
-                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                  <p className='text-[16px] uppercase font-bold text-gray-400 tracking-widest'>
                     Species
                   </p>
-                  <p className='text-gray-700 font-medium'>
-                    {character.species}
-                  </p>
+                  <p style={textStyle}>{character.species}</p>
                 </div>
                 <div>
-                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                  <p className='text-[16px] uppercase font-bold text-gray-400 tracking-widest'>
                     Gender
                   </p>
-                  <p className='text-gray-700 font-medium'>
-                    {character.gender}
-                  </p>
+                  <p style={textStyle}>{character.gender}</p>
                 </div>
                 <div>
-                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                  <p className='text-[16px] uppercase font-bold text-gray-400 tracking-widest'>
                     Type
                   </p>
-                  <p className='text-gray-700 font-medium'>
-                    {character.type || 'Standard'}
-                  </p>
+                  <p style={textStyle}>{character.type || 'Standard'}</p>
                 </div>
                 <div>
-                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                  <p className='text-[16px] uppercase font-bold text-gray-400 tracking-widest'>
                     Origin
                   </p>
-                  <p className='text-gray-700 font-medium'>
-                    {character.origin.name}
-                  </p>
+                  <p style={textStyle}>{character.origin.name}</p>
                 </div>
               </div>
 
               <div className='mt-8 pt-6 border-t border-gray-50'>
-                <p className='text-[10px] uppercase font-bold text-blue-500 tracking-widest'>
+                <p className='text-[16px] uppercase font-bold text-blue-500 tracking-widest'>
                   Current Location
                 </p>
-                <p className='text-xl font-bold text-gray-800'>
-                  {character.location.name}
-                </p>
+                <p style={textStyle}>{character.location.name}</p>
               </div>
             </div>
           </div>
@@ -127,7 +128,7 @@ const DetailsPage: React.FC = () => {
             </h3>
             <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4'>
               {residents
-                .filter((r) => r.id !== character.id) // No mostrarse a sí mismo
+                .filter((r) => r.id !== character.id)
                 .map((resident) => (
                   <div
                     key={resident.id}
@@ -139,10 +140,10 @@ const DetailsPage: React.FC = () => {
                       className='w-full h-auto rounded-xl mb-3 grayscale group-hover:grayscale-0 transition-all'
                       alt={resident.name}
                     />
-                    <p className='text-xs font-bold text-gray-800 truncate'>
+                    <p className='text-md font-bold text-gray-800 truncate'>
                       {resident.name}
                     </p>
-                    <p className='text-[10px] text-gray-400'>
+                    <p className='text-[12px] text-gray-400'>
                       {resident.species}
                     </p>
                   </div>
