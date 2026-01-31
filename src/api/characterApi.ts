@@ -41,7 +41,7 @@ export const getCharacterById = async (
   id: number,
   signal?: AbortSignal,
 ): Promise<Character> => {
-  const response = await fetch(`${BASE_URL}/character/${id}`, { signal });
+  const response = await fetch(`${BASE_URL}/${id}`, { signal });
 
   if (!response.ok) {
     throw new Error('Failed to fetch character');

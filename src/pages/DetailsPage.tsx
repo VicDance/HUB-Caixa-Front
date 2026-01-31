@@ -1,12 +1,12 @@
-import CharacterComponent from '@/components/Character/Character';
 import { useCharacters } from '@/hooks/useCharacters';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const FILTERS = {};
 
 const DetailsPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const { characters, loading, error } = useCharacters(FILTERS, Number(id));
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { characters, loading, error, residents } = useCharacters(FILTERS, Number(id));
 
   const character = characters[0];
 
@@ -27,11 +27,129 @@ const DetailsPage: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 p-6'>
-      <div className='max-w-3xl mx-auto bg-white rounded-xl shadow-md p-4'>
-        <CharacterComponent
-          character={character}
-        />
+    <div className='min-h-screen bg-gray-50 p-4 md:p-10'>
+      <div className='max-w-3xl mx-auto'>
+        <button
+          onClick={() => navigate(-1)}
+          className='mb-6 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2'
+        >
+          ← Back to dimension
+        </button>
+        <div className='bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 p-10'>
+          <div className='flex flex-col items-center'>
+            {/* Image */}
+            <div
+              className='relative w-48 h-48 mb-6 group'
+              style={{ paddingTop: '10px' }}
+            >
+              <img
+                src={character.image}
+                alt={character.name}
+                className='w-full h-full object-cover rounded-full border-4 border-blue-50 shadow-lg'
+              />
+
+              {/* State Badge */}
+              <span
+                className={`absolute bottom-2 right-2 px-10 py-2 rounded-full text-[10px] font-bold uppercase border-2 border-white shadow-sm ${
+                  character.status === 'Alive'
+                    ? 'bg-green-500 text-white'
+                    : character.status === 'Dead'
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-500 text-white'
+                }`}
+                style={{ zIndex: 10 }}
+              >
+                {character.status}
+              </span>
+            </div>
+
+            {/* Details */}
+            <div className='p-8 md:w-3/5'>
+              <div className='flex justify-between items-start mb-4'>
+                <h1 className='text-4xl font-black text-gray-900 leading-none'>
+                  {character.name}
+                </h1>
+              </div>
+
+              <div className='grid grid-cols-2 gap-y-6 gap-x-4 mt-8'>
+                <div>
+                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                    Species
+                  </p>
+                  <p className='text-gray-700 font-medium'>
+                    {character.species}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                    Gender
+                  </p>
+                  <p className='text-gray-700 font-medium'>
+                    {character.gender}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                    Type
+                  </p>
+                  <p className='text-gray-700 font-medium'>
+                    {character.type || 'Standard'}
+                  </p>
+                </div>
+                <div>
+                  <p className='text-[10px] uppercase font-bold text-gray-400 tracking-widest'>
+                    Origin
+                  </p>
+                  <p className='text-gray-700 font-medium'>
+                    {character.origin.name}
+                  </p>
+                </div>
+              </div>
+
+              <div className='mt-8 pt-6 border-t border-gray-50'>
+                <p className='text-[10px] uppercase font-bold text-blue-500 tracking-widest'>
+                  Current Location
+                </p>
+                <p className='text-xl font-bold text-gray-800'>
+                  {character.location.name}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RESIDENTS */}
+        {residents.length > 0 && (
+          <div className='mt-12'>
+            <h3 className='text-xl font-bold text-gray-800 mb-6'>
+              Other residents of{' '}
+              <span className='text-blue-600'>{character.location.name}</span>
+            </h3>
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4'>
+              {residents
+                .filter((r) => r.id !== character.id) // No mostrarse a sí mismo
+                .map((resident) => (
+                  <div
+                    key={resident.id}
+                    onClick={() => navigate(`/character/${resident.id}`)}
+                    className='bg-white p-3 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer group'
+                  >
+                    <img
+                      src={resident.image}
+                      className='w-full h-auto rounded-xl mb-3 grayscale group-hover:grayscale-0 transition-all'
+                      alt={resident.name}
+                    />
+                    <p className='text-xs font-bold text-gray-800 truncate'>
+                      {resident.name}
+                    </p>
+                    <p className='text-[10px] text-gray-400'>
+                      {resident.species}
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
