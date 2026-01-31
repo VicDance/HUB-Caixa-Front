@@ -1,4 +1,5 @@
 import { useCharacters } from '@/hooks/useCharacters';
+import { useFavourites } from '@/hooks/useFavourites';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const FILTERS = {};
@@ -10,8 +11,10 @@ const DetailsPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { characters, loading, error, residents } = useCharacters(FILTERS, Number(id));
+  const { toggleFavourite, isFavourite } = useFavourites();
 
   const character = characters[0];
+  const isFav = isFavourite(character?.id);
 
   if (loading) {
     return (
@@ -43,7 +46,7 @@ const DetailsPage: React.FC = () => {
             {/* Image */}
             <div
               className='relative w-48 h-48 mb-6 group'
-              style={{ paddingTop: '10px' }}
+              style={{ paddingTop: '10px', paddingBottom: '10px' }}
             >
               <img
                 src={character.image}
@@ -55,7 +58,7 @@ const DetailsPage: React.FC = () => {
               <span
                 className={`absolute bottom-2 -right-4 px-12 py-12 rounded-full text-[10px] font-bold uppercase border-2 border-white shadow-sm text-center`}
                 style={{
-                  minWidth: '50px',
+                  minWidth: '70px',
                   backgroundColor:
                     character.status === 'Alive'
                       ? '#dcfce7'
@@ -73,6 +76,17 @@ const DetailsPage: React.FC = () => {
                 {character.status}
               </span>
             </div>
+
+            <button
+              onClick={() => toggleFavourite(character)}
+              className={`mt-4 px-6 py-2 rounded-full font-bold text-sm transition-all flex items-center gap-2 ${
+                isFav 
+                  ? 'bg-red-500 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              }`}
+            >
+              {isFav ? '❤️ In Favourites' : '🤍 Add to Favourites'}
+            </button>
 
             {/* Details */}
             <div className='p-8 md:w-3/5'>

@@ -1,19 +1,28 @@
+import { Character } from '@/types/character';
 import { useEffect, useState } from 'react';
 
-export const useFavorites = () => {
-  const [favorites, setFavorites] = useState<number[]>(() =>
-    JSON.parse(localStorage.getItem('favorites') ?? '[]'),
-  );
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
-    );
-  };
+export const useFavourites = () => {
+  const [favourites, setFavourites] = useState<Character[]>(() => {
+    const saved = localStorage.getItem('rm-favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+    localStorage.setItem('rm-favorites', JSON.stringify(favourites));
+  }, [favourites]);
 
-  return { favorites, toggleFavorite };
+  const toggleFavourite = (character: Character) => {
+    setFavourites((prev) => {
+      const isFav = prev.some((fav) => fav.id === character.id);
+      if (isFav) {
+        return prev.filter((fav) => fav.id !== character.id);
+      } else {
+        return [...prev, character];
+      }
+    });
+  };
+
+  const isFavourite = (id: number) => favourites.some((fav) => fav.id === id);
+
+  return { favourites, toggleFavourite, isFavourite };
 };

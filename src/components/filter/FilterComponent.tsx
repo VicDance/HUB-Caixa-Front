@@ -16,7 +16,7 @@ const FilterComponent = () => {
   const [name, setName] = useState(searchParams.get('name') || '');
   const [species, setSpecies] = useState(searchParams.get('species') || '');
 
-  const TIMEOUT = 300;
+  const TIMEOUT = 500;
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
