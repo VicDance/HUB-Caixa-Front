@@ -10,6 +10,7 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [residents, setResidents] = useState<Character[]>([]);
+  const [loadingResidents, setLoadingResidents] = useState<boolean>(false);
 
   const cacheKey = useMemo(
     () => JSON.stringify({ id, ...filters }),
@@ -45,15 +46,18 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
         if (isMounted) {
           cache.set(cacheKey, data);
           setCharacters(data);
+          setLoading(false);
           setError(null);
         }
 
         const character = data[0];
         if (
-          idRef.current &&
+          id &&
           character?.location?.url &&
           character.location.name !== 'unknown'
         ) {
+          setLoadingResidents(true);
+
           const res = await fetch(character.location.url, {
             signal: controller.signal,
           });
@@ -64,10 +68,15 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
             .map((url: string) => Number(url.split('/').pop()));
 
           const neighborData = await Promise.all(
-            neighborIds.map( (nId: number) => getCharacterById(nId, controller.signal)),
+            neighborIds.map((nId: number) =>
+              getCharacterById(nId, controller.signal),
+            ),
           );
 
-          if (isMounted) setResidents(neighborData);
+          if (isMounted) {
+            setResidents(neighborData);
+            setLoadingResidents(false);
+          }
         } else {
           setResidents([]);
         }
@@ -78,6 +87,11 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
           error.message === 'The operation was aborted'
         ) {
           return;
+        }
+        if (isMounted) {
+          setError(error.message);
+          setLoading(false);
+          setLoadingResidents(false);
         }
       } finally {
         if (isMounted) {
@@ -92,7 +106,7 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
       isMounted = false;
       controller.abort();
     };
-  }, [cacheKey]);
+  }, [cacheKey, id]);
 
-  return { characters, loading, error, residents };
+  return { characters, loading, error, residents, loadingResidents };
 };

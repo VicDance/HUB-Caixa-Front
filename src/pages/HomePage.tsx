@@ -13,8 +13,6 @@ const HomePage: React.FC = () => {
   };
   const { characters, loading } = useCharacters(filters);
   const { favourites } = useFavourites();
-
-  if (loading) return <div className="flex justify-center p-20 text-blue-500 animate-pulse font-bold text-xl">LOADING MULTIVERSE...</div>;
   
   return (
     <div className='min-h-screen bg-[#f9fafb] font-["Open_Sans",sans-serif]'>
@@ -39,7 +37,10 @@ const HomePage: React.FC = () => {
             </span>
           </div>
           {/* Fila Horizontal con Scroll */}
-          <div className='flex overflow-x-auto pb-6 pt-2 no-scrollbar' style={{gap: 12}}>
+          <div
+            className='flex overflow-x-auto pb-6 pt-2 no-scrollbar'
+            style={{ gap: 12 }}
+          >
             {favourites.map((fav) => (
               <div
                 key={fav.id}
@@ -67,17 +68,19 @@ const HomePage: React.FC = () => {
       <div className='max-w-7xl p-6 md:p-12'>
         <FilterComponent />
 
-        <div
-          className={`flex flex-col transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
-        >
-          {characters.map((character) => (
-            <div key={character.id} className='flex flex-row'>
-              <CharacterComponent
-                character={character}
-                onClick={(id) => navigate(`/character/${id}`)}
-              />
-            </div>
-          ))}
+        <div className='flex flex-col transition-opacity duration-300'>
+          {loading && characters.length === 0
+            ? Array.from({ length: 5 }).map((_, i) => (
+                <CharacterComponent key={Number(i)} />
+              ))
+            : characters.map((character, index) => (
+                <CharacterComponent
+                  key={character.id}
+                  character={character}
+                  priority={index < 4}
+                  onClick={(id) => navigate(`/character/${id}`)}
+                />
+              ))}
           {characters.length === 0 && !loading && (
             <div className='text-center py-20 text-gray-400'>
               <p className='text-xl'>
