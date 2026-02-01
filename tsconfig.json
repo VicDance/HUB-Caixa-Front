@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] },
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
+    "types": ["vitest/globals", "@testing-library/jest-dom"]
   },
   "include": ["src", "vite.config.ts", "src/global.d.ts"]
 }
