@@ -1,4 +1,4 @@
-import CharacterComponent from '@/components/Character/Character';
+import CharacterComponent from '@/components/character/Character';
 import FilterComponent from '@/components/filter/FilterComponent';
 import { useCharacters } from '@/hooks/useCharacters';
 import { useFavourites } from '@/hooks/useFavourites';
