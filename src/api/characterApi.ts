@@ -2,6 +2,7 @@ import { CharacterFilters } from '@/components/filter/FilterComponent';
 import type { Character } from '@/types/character';
 
 const BASE_URL = 'https://rickandmortyapi.com/api/character';
+const characterByIdCache = new Map<number, Character>();
 
 export const getCharacters = async (
   filters: CharacterFilters = {},
@@ -26,7 +27,13 @@ export const getCharacters = async (
       throw new Error('Error fetching characters');
     }
     const data = await response.json();
-    return data.results || [];
+    const characters: Character[] = data.results || [];
+
+    characters.forEach((character) => {
+      characterByIdCache.set(character.id, character);
+    });
+
+    return characters;
   } catch (err: unknown) {
     const error = err as Error;
     if (error.name === 'AbortError') {
@@ -41,11 +48,19 @@ export const getCharacterById = async (
   id: number,
   signal?: AbortSignal,
 ): Promise<Character> => {
+  if (characterByIdCache.has(id)) {
+    return characterByIdCache.get(id)!;
+  }
+
   const response = await fetch(`${BASE_URL}/${id}`, { signal });
 
   if (!response.ok) {
     throw new Error('Failed to fetch character');
   }
 
-  return response.json();
+  const character = await response.json();
+
+  characterByIdCache.set(id, character);
+
+  return character;
 };

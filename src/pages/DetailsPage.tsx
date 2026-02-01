@@ -1,6 +1,7 @@
 import { useCharacters } from '@/hooks/useCharacters';
 import { useFavourites } from '@/hooks/useFavourites';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Character } from '@/types/character';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
 const FILTERS = {};
 const textStyle = {
@@ -12,8 +13,10 @@ const DetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const { characters, loading, error, residents } = useCharacters(FILTERS, Number(id));
   const { toggleFavourite, isFavourite } = useFavourites();
+  const location = useLocation();
 
-  const character = characters[0];
+  const characterFromState = location.state as Character | undefined;
+  const character = characterFromState ?? characters[0];
   const isFav = isFavourite(character?.id);
 
   if (loading) {
@@ -36,7 +39,7 @@ const DetailsPage: React.FC = () => {
     <div className='min-h-screen bg-gray-50 p-4 md:p-10'>
       <div className='max-w-3xl mx-auto'>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className='mb-6 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2'
         >
           ← Back to dimension

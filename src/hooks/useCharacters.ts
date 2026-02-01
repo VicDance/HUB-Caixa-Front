@@ -58,25 +58,27 @@ export const useCharacters = (filters: CharacterFilters = {}, id?: number) => {
         ) {
           setLoadingResidents(true);
 
-          const res = await fetch(character.location.url, {
-            signal: controller.signal,
-          });
-          const planet = await res.json();
-
-          const neighborIds = planet.residents
-            .slice(0, 5)
-            .map((url: string) => Number(url.split('/').pop()));
-
-          const neighborData = await Promise.all(
-            neighborIds.map((nId: number) =>
-              getCharacterById(nId, controller.signal),
-            ),
-          );
-
-          if (isMounted) {
-            setResidents(neighborData);
-            setLoadingResidents(false);
-          }
+          fetch(character.location.url, { signal: controller.signal })
+            .then((res) => res.json())
+            .then(async (planet) => {
+              const neighborIds = planet.residents
+                .slice(0, 5)
+                .map((url: string) => url.split('/').pop());
+              const neighbors = await Promise.all(
+                neighborIds.map((nId: string) =>
+                  getCharacterById(Number(nId), controller.signal),
+                ),
+              );
+              if (isMounted) {
+                setResidents(neighbors);
+              }
+            })
+            .catch(() => {})
+            .finally(() => {
+              if (isMounted) {
+                setLoadingResidents(false);
+              }
+            });
         } else {
           setResidents([]);
         }

@@ -36,7 +36,6 @@ const HomePage: React.FC = () => {
               {favourites.length} Characters
             </span>
           </div>
-          {/* Fila Horizontal con Scroll */}
           <div
             className='flex overflow-x-auto pb-6 pt-2 no-scrollbar'
             style={{ gap: 12 }}
@@ -56,7 +55,6 @@ const HomePage: React.FC = () => {
                 </div>
                 <p className='text-[10px] font-black text-gray-700 uppercase tracking-tighter truncate w-20'>
                   {fav.name.split(' ')[0]}{' '}
-                  {/* Solo el primer nombre para que no ocupe mucho */}
                 </p>
               </div>
             ))}
@@ -78,7 +76,7 @@ const HomePage: React.FC = () => {
                   key={character.id}
                   character={character}
                   priority={index < 4}
-                  onClick={(id) => navigate(`/character/${id}`)}
+                  onClick={(id) => navigate(`/character/${id}`, { state: character })}
                 />
               ))}
           {characters.length === 0 && !loading && (
